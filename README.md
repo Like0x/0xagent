@@ -2,7 +2,7 @@
 CobaltStrike 4.0 - 4.5 Patch
 
 
-Changed from [CSAgent](https://github.com/Twi1ight/CSAgent).
+Changed from [CSAgent](https://github.com/Twi1ight/CSAgent). review by [dust-life](https://github.com/dust-life).
 
 The key for 4.5 is not available here, Just a loader.
 
