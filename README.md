@@ -12,6 +12,7 @@ The key for 4.5 is not available here, Just a loader.
 - Patch javaagemt detection
 - Patch Authorization
 - Patch Checksum8
+- Patch profile saving feature, so that your configuration information will not be saved in `.aggressor.prop`, preventing information leakage by countermeasures.
 
 Just that's all.
 
