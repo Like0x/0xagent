@@ -133,9 +133,10 @@ public class PreMain {
                     cls.addMethod(hex2bytes);
 
                     CtConstructor mtd = cls.getDeclaredConstructor(new CtClass[]{});
-                    mtd.setBody("{$0.watermark = 95275201314;" +
+                    mtd.setBody("{$0.watermark = 100000;" +
                             "$0.validto = \"forever\";" +
                             "$0.valid = true;" +
+                            "$0.watermarkHash = \"BeudtKgqnlm0Ruvf+VYxuw==\";" +
                             "common.MudgeSanity.systemDetail(\"valid to\", \"perpetual\");" +
                             "common.MudgeSanity.systemDetail(\"id\", String.valueOf($0.watermark));" +
                             "common.SleevedResource.Setup(hex2bytes(\"" + hexkey + "\"));" +
