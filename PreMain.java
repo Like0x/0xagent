@@ -15,58 +15,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PreMain {
-    public static void premain(String agentArgs, Instrumentation inst) throws Exception {
-
-        if (agentArgs == null) {
-            print_error("Please give me key to setup, xxx.jar=xxxxx");
-            return;
-        }else{
-            print_good("I got you key,Patching~");
-        }
-
-        // check hash
-        HashMap<String, String> hashArray = new HashMap<String, String>();
-
-        hashArray.put("Cobalt Strike 4.5 (December 14, 2021)", "a5e980aac32d9c7af1d2326008537c66d55d7d9ccf777eb732b2a31f4f7ee523");
-        hashArray.put("Cobalt Strike 4.4 (August 04, 2021) ", "7af9c759ac78da920395debb443b9007fdf51fa66a48f0fbdaafb30b00a8a858");
-        hashArray.put("Cobalt Strike 4.3 (March 17, 2021) [bug fixes]", "c3c243e6218f7fbaaefb916943f500722644ec396cf91f31a30c777c2d559465");
-        hashArray.put("Cobalt Strike 4.3 (March 3, 2021)", "02fa5afe9e58cb633328314b279762a03894df6b54c0129e8a979afcfca83d51");
-        hashArray.put("Cobalt Strike 4.2 (November 6, 2020)", "56a53682084c46813a5157d73d7917100c9979b67e94b05c1b3244469e7ee07a");
-        hashArray.put("Cobalt Strike 4.1 (June 25, 2020)", "1f2c29099ba7de0f7f05e0ca0efb58b56ec422b65d1c64e66633fa9d8f469d4f");
-        hashArray.put("Cobalt Strike 4.0 (February 22, 2020) [bug fixes]", "10fe0fcdb6b89604da379d9d6bca37b8279f372dc235bbaf721adfd83561f2b3");
-        hashArray.put("Cobalt Strike 4.0 (December 5, 2019)", "558f61bfab60ef5e6bec15c8a6434e94249621f53e7838868cdb3206168a0937");
-
-        print_info("Hey! guys,I'll check file sha256 hash,Please wait me about 10s......");
-
-        File file = new File("cobaltstrike.jar");
-
-        if(!file.exists()){
-            print_error("Hey guys,Please rename your xxx.jar to cobaltstrike.jar Thanks!");
-            System.exit(1);
-        }else{
-            print_good("Loading cobaltstrike.jar");
-        }
-
-
-        String FileHash = getHash(file);
-
-        boolean isTrueFile = false;
-
-        System.out.println(FileHash);
-        for (String version : hashArray.keySet()) {
-            if(hashArray.get(version).equals(FileHash)){
-                print_good("File: " + file + "; Version: " + version + "; SHA256: " + hashArray.get(version));
-                isTrueFile = true;
-            }
-
-        }
-        if(!isTrueFile){
-            print_error("SHA256: " + FileHash + " Fuck off! Get out! Bad cobaltstrike.jar");
-            System.exit(1);
-        }
-
-        inst.addTransformer(new CobaltStrikeTransformer(agentArgs), true);
-    }
 
     public static final String scrub(String var0) {
         return var0 == null ? null : var0.replace('\u001b', '.');
@@ -88,6 +36,64 @@ public class PreMain {
         System.out.println("\u001b[01;35m[*]\u001b[0m " + scrub(var0));
     }
 
+    public static String VERSION;
+
+    public static void premain(String agentArgs, Instrumentation inst) throws Exception {
+
+        if (agentArgs == null) {
+            print_error("Please give me key to setup, xxx.jar=xxxxx");
+            return;
+        }else{
+            print_good("I got you key,Patching~");
+        }
+
+        // check hash
+        HashMap<String, String> hashArray = new HashMap<String, String>();
+
+        hashArray.put("Cobalt Strike 4.5 (December 14, 2021)", "a5e980aac32d9c7af1d2326008537c66d55d7d9ccf777eb732b2a31f4f7ee523");
+        hashArray.put("Cobalt Strike 4.4 (August 04, 2021) ", "7af9c759ac78da920395debb443b9007fdf51fa66a48f0fbdaafb30b00a8a858");
+        hashArray.put("Cobalt Strike 4.3 (March 17, 2021) [bug fixes]", "c3c243e6218f7fbaaefb916943f500722644ec396cf91f31a30c777c2d559465");
+        hashArray.put("Cobalt Strike 4.3 (March 3, 2021)", "02fa5afe9e58cb633328314b279762a03894df6b54c0129e8a979afcfca83d51");
+        hashArray.put("Cobalt Strike 4.2 (November 6, 2020)", "56a53682084c46813a5157d73d7917100c9979b67e94b05c1b3244469e7ee07a");
+        hashArray.put("Cobalt Strike 4.1 (June 25, 2020)", "1f2c29099ba7de0f7f05e0ca0efb58b56ec422b65d1c64e66633fa9d8f469d4f");
+        hashArray.put("Cobalt Strike 4.0 (February 22, 2020) [bug fixes]", "10fe0fcdb6b89604da379d9d6bca37b8279f372dc235bbaf721adfd83561f2b3");
+        hashArray.put("Cobalt Strike 4.0 (December 5, 2019)", "558f61bfab60ef5e6bec15c8a6434e94249621f53e7838868cdb3206168a0937");
+
+        print_info("JDK: " + System.getProperty("java.version"));
+        if(System.getProperty("java.version").contains("1.8")){
+            print_info("Using jdk8 will make the startup time as long as 10-15s");
+        }
+
+        File file = new File("cobaltstrike.jar");
+
+        if(!file.exists()){
+            print_error("Hey guys,Please rename your xxx.jar to cobaltstrike.jar Thanks!");
+            System.exit(1);
+        }else{
+            print_good("Loading cobaltstrike.jar");
+        }
+
+
+        String FileHash = getHash(file);
+        boolean isTrueFile = false;
+
+        System.out.println(FileHash);
+        for (String version : hashArray.keySet()) {
+            if(hashArray.get(version).equals(FileHash)){
+                print_good("File: " + file + "; Version: " + version + "; SHA256: " + hashArray.get(version));
+                isTrueFile = true;
+                VERSION = version;
+            }
+
+        }
+        if(!isTrueFile){
+            print_error("SHA256: " + FileHash + " Fuck off! Get out! Bad cobaltstrike.jar");
+            System.exit(1);
+        }
+
+        inst.addTransformer(new CobaltStrikeTransformer(agentArgs), true);
+    }
+
     static class CobaltStrikeTransformer implements ClassFileTransformer {
         private final ClassPool classPool = ClassPool.getDefault();
         private final String hexkey;
@@ -105,17 +111,33 @@ public class PreMain {
                 if (className == null) {
                     return classfileBuffer;
                 } else if (className.equals("sun/management/VMManagementImpl")) {
-                    print_good("Patch exit");
-                    CtClass cls = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
-                    CtMethod cmsave = cls.getDeclaredMethod("getVmArguments");
-                    cmsave.setBody("{ java.util.List listr;\n" +
-                            "        listr = new java.util.ArrayList();\n" +
-                            "        listr.add(\"-XX:+AggressiveHeap\");\n" +
-                            "        listr.add(\"-XX:+UseParallelGC\");\n" +
-                            "        return listr; }");
-                    return cls.toBytecode();
+                    if (VERSION.contains("4.5")){
+                        print_good("Patch javaagent exit");
+                        CtClass cls = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
+                        CtMethod cmsave = cls.getDeclaredMethod("getVmArguments");
+                        cmsave.setBody("{ java.util.List listr;\n" +
+                                "        listr = new java.util.ArrayList();\n" +
+                                "        listr.add(\"-XX:+AggressiveHeap\");\n" +
+                                "        listr.add(\"-XX:+UseParallelGC\");\n" +
+                                "        return listr; }");
+                        return cls.toBytecode();
+                    }
+
                 }
-                else if (className.equals("common/Authorization")) {
+                else if(className.equals("javax/swing/plaf/basic/BasicHTML")) {
+                    try {
+                        ClassPool classPool = ClassPool.getDefault();
+                        classPool.appendClassPath(new LoaderClassPath(loader));
+                        CtClass clazz = classPool.makeClass(new ByteArrayInputStream(classfileBuffer), false);
+                        CtMethod method = clazz.getDeclaredMethod("isHTMLString");
+                        method.setBody("return false;");
+                        print_good("CVE-2022-39197 Successfully Patched.");
+                        return clazz.toBytecode();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        print_error("Patch Failed.");
+                    }
+                } else if (className.equals("common/Authorization")) {
                     // set key
                     CtClass cls = null;
 
@@ -133,14 +155,26 @@ public class PreMain {
                     cls.addMethod(hex2bytes);
 
                     CtConstructor mtd = cls.getDeclaredConstructor(new CtClass[]{});
-                    mtd.setBody("{$0.watermark = 100000;" +
-                            "$0.validto = \"forever\";" +
-                            "$0.valid = true;" +
-                            "$0.watermarkHash = \"BeudtKgqnlm0Ruvf+VYxuw==\";" +
-                            "common.MudgeSanity.systemDetail(\"valid to\", \"perpetual\");" +
-                            "common.MudgeSanity.systemDetail(\"id\", String.valueOf($0.watermark));" +
-                            "common.SleevedResource.Setup(hex2bytes(\"" + hexkey + "\"));" +
-                            "}");
+                    if (VERSION.contains("4.5")){
+                        mtd.setBody("{$0.watermark = 100000;" +
+                                "$0.validto = \"forever\";" +
+                                "$0.valid = true;" +
+                                "$0.watermarkHash = \"BeudtKgqnlm0Ruvf+VYxuw==\";" +
+                                "common.MudgeSanity.systemDetail(\"valid to\", \"perpetual\");" +
+                                "common.MudgeSanity.systemDetail(\"id\", String.valueOf($0.watermark));" +
+                                "common.SleevedResource.Setup(hex2bytes(\"" + hexkey + "\"));" +
+                                "}");
+                    } else{
+                        mtd.setBody("{$0.watermark = 95275201314;" +
+                                "$0.validto = \"forever\";" +
+                                "$0.valid = true;" +
+                                "common.MudgeSanity.systemDetail(\"valid to\", \"perpetual\");" +
+                                "common.MudgeSanity.systemDetail(\"id\", String.valueOf($0.watermark));" +
+                                "common.SleevedResource.Setup(hex2bytes(\"" + hexkey + "\"));" +
+                                "}");
+                    }
+
+
                     return cls.toBytecode();
 
                 } else if (className.equals("sleep/runtime/ScriptLoader")) {
